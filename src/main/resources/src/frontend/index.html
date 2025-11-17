@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Frotas</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-theme="dark">
+<header>
+    <div class="header-left">
+        <h1>Gestão de Frotas</h1>
+        <nav>
+            <button data-tab="tab-maquinas" class="tab-button active">Máquinas</button>
+            <button data-tab="tab-manutencoes" class="tab-button">Manutenções</button>
+            <button data-tab="tab-abastecimentos" class="tab-button">Abastecimentos</button>
+            <button data-tab="tab-horas" class="tab-button">Horas</button>
+        </nav>
+    </div>
+
+    <button id="theme-toggle" class="theme-toggle">☀️ Claro</button>
+</header>
+
+<main>
+    <!-- ===================== MÁQUINAS ===================== -->
+    <section id="tab-maquinas" class="tab-content active">
+        <h2>Máquinas</h2>
+
+        <div class="card">
+            <h3>Cadastrar / Atualizar Máquina</h3>
+            <form id="form-maquina">
+                <input type="hidden" id="maquina-id">
+
+                <div class="form-row">
+                    <label for="maquina-nome">Nome</label>
+                    <input type="text" id="maquina-nome" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-tipo">Tipo</label>
+                    <input type="text" id="maquina-tipo" placeholder="TRATOR, COLHEITADEIRA..." required>
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-modelo">Modelo</label>
+                    <input type="text" id="maquina-modelo">
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-ano">Ano</label>
+                    <input type="number" id="maquina-ano" min="1900" max="2100">
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-numero-serie">Número de Série</label>
+                    <input type="text" id="maquina-numero-serie">
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-horimetro-atual">Horímetro Atual</label>
+                    <input type="number" step="0.1" id="maquina-horimetro-atual">
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-horimetro-prox-revisao">Horímetro Próx. Revisão</label>
+                    <input type="number" step="0.1" id="maquina-horimetro-prox-revisao">
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-data-ultima-manutencao">Última Manutenção</label>
+                    <input type="date" id="maquina-data-ultima-manutencao">
+                </div>
+
+                <div class="form-row">
+                    <label for="maquina-data-prox-manutencao">Próx. Manutenção</label>
+                    <input type="date" id="maquina-data-prox-manutencao">
+                </div>
+
+                <div class="form-row checkbox-row">
+                    <label>
+                        <input type="checkbox" id="maquina-ativo" checked>
+                        Ativa
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">Salvar</button>
+                    <button type="button" id="btn-maquina-limpar">Limpar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Lista de Máquinas</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Modelo</th>
+                    <th>Horímetro</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody id="tabela-maquinas-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Alertas de Revisão</h3>
+
+            <div class="form-row-inline">
+                <label for="alerta-margem-horas">Margem (horas)</label>
+                <input type="number" id="alerta-margem-horas" value="10" step="1">
+                <button id="btn-buscar-alertas-horas">Buscar (por Horas)</button>
+            </div>
+
+            <div class="form-row-inline">
+                <label for="alerta-dias-antes">Dias antes</label>
+                <input type="number" id="alerta-dias-antes" value="7" step="1">
+                <button id="btn-buscar-alertas-data">Buscar (por Data)</button>
+            </div>
+
+            <ul id="lista-alertas">
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===================== MANUTENÇÕES ===================== -->
+    <section id="tab-manutencoes" class="tab-content">
+        <h2>Manutenções</h2>
+
+        <div class="card">
+            <h3>Selecionar Máquina</h3>
+            <div class="form-row">
+                <label for="select-maquina-manutencao">Máquina</label>
+                <select id="select-maquina-manutencao">
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Registrar Manutenção</h3>
+            <form id="form-manutencao">
+                <div class="form-row">
+                    <label for="manutencao-data">Data</label>
+                    <input type="date" id="manutencao-data" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="manutencao-tipo">Tipo</label>
+                    <input type="text" id="manutencao-tipo" placeholder="PREVENTIVA, CORRETIVA..." required>
+                </div>
+
+                <div class="form-row">
+                    <label for="manutencao-descricao">Descrição</label>
+                    <textarea id="manutencao-descricao" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <label for="manutencao-custo">Custo</label>
+                    <input type="number" step="0.01" id="manutencao-custo" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="manutencao-horas-uso">Horas de uso no momento</label>
+                    <input type="number" step="0.1" id="manutencao-horas-uso">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">Registrar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Manutenções da Máquina Selecionada</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Custo</th>
+                    <th>Horas Uso</th>
+                </tr>
+                </thead>
+                <tbody id="tabela-manutencoes-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Total Gasto em Manutenção</h3>
+            <p>
+                Total: R$ <span id="total-manutencao">0,00</span>
+            </p>
+            <button id="btn-atualizar-total-manutencao">Atualizar Total</button>
+        </div>
+    </section>
+
+    <!-- ===================== ABASTECIMENTOS ===================== -->
+    <section id="tab-abastecimentos" class="tab-content">
+        <h2>Abastecimentos</h2>
+
+        <div class="card">
+            <h3>Selecionar Máquina</h3>
+            <div class="form-row">
+                <label for="select-maquina-abastecimento">Máquina</label>
+                <select id="select-maquina-abastecimento">
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Registrar Abastecimento</h3>
+            <form id="form-abastecimento">
+                <div class="form-row">
+                    <label for="abastecimento-data">Data</label>
+                    <input type="date" id="abastecimento-data" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="abastecimento-litros">Litros</label>
+                    <input type="number" step="0.01" id="abastecimento-litros" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="abastecimento-custo">Custo Total</label>
+                    <input type="number" step="0.01" id="abastecimento-custo" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="abastecimento-horimetro">Horímetro no momento</label>
+                    <input type="number" step="0.1" id="abastecimento-horimetro">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">Registrar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Abastecimentos da Máquina Selecionada</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Litros</th>
+                    <th>Custo</th>
+                    <th>Horímetro</th>
+                </tr>
+                </thead>
+                <tbody id="tabela-abastecimentos-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Resumo e Consumo Médio</h3>
+
+            <div class="form-row-inline">
+                <label for="resumo-data-inicio">Início</label>
+                <input type="date" id="resumo-data-inicio">
+
+                <label for="resumo-data-fim">Fim</label>
+                <input type="date" id="resumo-data-fim">
+
+                <button id="btn-atualizar-resumo">Atualizar Resumo</button>
+            </div>
+
+            <p>Total de litros: <span id="resumo-litros">0</span></p>
+            <p>Total de custo: R$ <span id="resumo-custo">0,00</span></p>
+            <p>Consumo médio (L/h): <span id="resumo-consumo-medio">–</span></p>
+        </div>
+    </section>
+
+    <!-- ===================== REGISTRO DE HORAS ===================== -->
+    <section id="tab-horas" class="tab-content">
+        <h2>Registro de Horas</h2>
+
+        <div class="card">
+            <h3>Selecionar Máquina</h3>
+            <div class="form-row">
+                <label for="select-maquina-horas">Máquina</label>
+                <select id="select-maquina-horas">
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Registrar Horas Trabalhadas</h3>
+            <form id="form-horas">
+                <div class="form-row">
+                    <label for="horas-data">Data</label>
+                    <input type="date" id="horas-data" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="horas-quantidade">Horas trabalhadas</label>
+                    <input type="number" step="0.1" id="horas-quantidade" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="horas-observacao">Observação</label>
+                    <textarea id="horas-observacao" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">Registrar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Registros de Horas da Máquina Selecionada</h3>
+
+            <div class="form-row-inline">
+                <label for="horas-data-inicio">Início</label>
+                <input type="date" id="horas-data-inicio">
+
+                <label for="horas-data-fim">Fim</label>
+                <input type="date" id="horas-data-fim">
+
+                <button id="btn-filtrar-horas">Filtrar</button>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Horas Trabalhadas</th>
+                    <th>Observação</th>
+                </tr>
+                </thead>
+                <tbody id="tabela-horas-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Total de Horas Trabalhadas</h3>
+            <p>Total no período: <span id="total-horas-periodo">0</span> h</p>
+            <button id="btn-atualizar-total-horas">Atualizar Total</button>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <small>Sistema de Gestão de Frotas - Exemplo</small>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
